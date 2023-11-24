@@ -1,0 +1,29 @@
+[ {
+  "date" : "2023-11-24 18:59 PM UTC",
+  "id" : 0,
+  "productName" : "Testowa nazwa 2",
+  "quantity" : 2,
+  "provider" : "InPost",
+  "totalPrice" : 31.0
+}, {
+  "date" : "2023-11-24 19:02 PM UTC",
+  "id" : 1,
+  "productName" : "Testowa nazwa 2",
+  "quantity" : 14,
+  "provider" : "UPS",
+  "totalPrice" : 217.0
+}, {
+  "date" : "2023-11-24 19:06 PM UTC",
+  "id" : 2,
+  "productName" : "test",
+  "quantity" : 5,
+  "provider" : "DHL",
+  "totalPrice" : 60.0
+}, {
+  "date" : "2023-11-24 19:11 PM UTC",
+  "id" : 3,
+  "productName" : "Calkiem nowy produkt",
+  "quantity" : 5,
+  "provider" : "FedEx",
+  "totalPrice" : 61.0
+} ]

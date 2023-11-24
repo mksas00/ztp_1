@@ -1,0 +1,26 @@
+[ {
+  "name" : "Testowa nazwa 2",
+  "description" : "Testowy opis 2",
+  "price" : 15.5,
+  "weight" : 5.1
+}, {
+  "name" : "New Product",
+  "description" : "Updated description.",
+  "price" : 49.99,
+  "weight" : 2.5
+}, {
+  "name" : "New Product 2",
+  "description" : "Updated description.",
+  "price" : 14.50,
+  "weight" : 2.5
+}, {
+  "name" : "Calkiem nowy produkt",
+  "description" : "Test",
+  "price" : 12.2,
+  "weight" : 33.0
+}, {
+  "name" : "test",
+  "description" : "test",
+  "price" : 12.0,
+  "weight" : 13.0
+} ]

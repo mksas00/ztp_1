@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555555;
+        }
+
+        input, select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<a href="index.html">Go to Products Page</a>
+
+<h1>Orders</h1>
+
+<div id="order-display"></div>
+
+<div id="order-add-form" align="center">
+    <form id="add-order-form" accept-charset="UTF-8" onsubmit="submitForm(event); return false">
+        <label for="productName">Select a Product:</label>
+        <select id="productName" name="productName"></select>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required>
+
+        <label for="provider">Provider:</label>
+        <select id="provider" name="provider">
+            <option value="InPost">InPost</option>
+            <option value="DPD">DPD</option>
+            <option value="DHL">DHL</option>
+            <option value="UPS">UPS</option>
+            <option value="FedEx">FedEx</option>
+        </select>
+        <!-- Other form fields can be added here -->
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+
+<script>
+
+    function fetchProducts() {
+        // URL of the API endpoint you want to fetch data from
+        const apiUrl = 'http://localhost:8080/ztp_1_war/products';
+
+        // Options for the fetch request, including the method (GET in this case)
+        const options = {
+            method: 'GET',
+            headers: {
+                // You can include headers if needed, such as authorization headers
+                'Content-Type': 'application/json; charset=UTF-8',
+                // Add any other headers as needed
+            },
+        };
+
+        // Using the fetch API to make a GET request with specified options
+        fetch(apiUrl, options)
+            .then(response => {
+                console.log(response.headers.get('content-type'))
+                // Check if the request was successful (status code 200)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                // Parse the response as JSON
+                return response.json();
+            })
+            .then(data => {
+                // Handle the data
+                console.log(data)
+                populateProductNames(data)
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Fetch error:', error);
+            });
+    }
+
+    // Function to populate the select element with product names
+    function populateProductNames(products) {
+        const productNameSelect = document.getElementById('productName');
+
+        // Add options based on fetched product names
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.name;
+            option.textContent = product.name;
+            productNameSelect.appendChild(option);
+        });
+    }
+
+    fetchProducts()
+</script>
+<script>
+    function fetchData() {
+        // URL of the API endpoint you want to fetch data from
+        const apiUrl = 'http://localhost:8080/ztp_1_war/orders';
+
+        // Options for the fetch request, including the method (GET in this case)
+        const options = {
+            method: 'GET',
+            headers: {
+                // You can include headers if needed, such as authorization headers
+                'Content-Type': 'application/json; charset=UTF-8',
+                // Add any other headers as needed
+            },
+        };
+
+        // Using the fetch API to make a GET request with specified options
+        fetch(apiUrl, options)
+            .then(response => {
+                console.log(response.headers.get('content-type'))
+                // Check if the request was successful (status code 200)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                // Parse the response as JSON
+                return response.json();
+            })
+            .then(data => {
+                // Handle the data
+                console.log(data)
+                displayData(data)
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Fetch error:', error);
+            });
+    }
+
+    function displayData(data) {
+        // Display the fetched data in a table in the data-container element
+        const dataContainer = document.getElementById('order-display');
+
+        // Create a table element
+        const table = document.createElement('table');
+
+        // Create table headers
+
+        const headers = Object.keys(data[0]);
+        const headerRow = document.createElement('tr');
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+
+        table.appendChild(headerRow);
+        // Create table rows with data
+
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            headers.forEach(header => {
+                const td = document.createElement('td');
+                td.textContent = item[header];
+                row.appendChild(td);
+            });
+
+            table.appendChild(row);
+        });
+
+        // Append the table to the data-container
+        dataContainer.innerHTML = '';
+        dataContainer.appendChild(table);
+    }
+
+    fetchData()
+</script>
+
+<script>
+    function submitForm(event) {
+
+        event.preventDefault();
+        let apiUrl = 'http://localhost:8080/ztp_1_war/orders';
+
+        var formData = {
+            productName: document.getElementById('productName').value,
+            quantity: document.getElementById('quantity').value,
+            provider: document.getElementById('provider').value,
+        };
+
+        // Send POST request
+        fetch( apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response if needed
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+    }
+</script>
+
+</body>
+</html>

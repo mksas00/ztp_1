@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555555;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<a href="orders.html">Go to Orders Page</a>
+
+<h1>Products</h1>
+
+    <div id="product-display"></div>
+
+    <div id="product-add-form" align="center">
+        <h1>Create product</h1>
+
+        <form id="add-product-form" accept-charset="UTF-8">
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="1" required></textarea>
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" required>
+
+            <label for="weight">Weight:</label>
+            <input type="number" id="weight" name="weight" min="0" step="0.01" required>
+
+            <button type="submit" onclick="submitForm()">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function fetchData() {
+            // URL of the API endpoint you want to fetch data from
+            const apiUrl = 'http://localhost:8080/ztp_1_war/products';
+
+            // Options for the fetch request, including the method (GET in this case)
+            const options = {
+                method: 'GET',
+                headers: {
+                    // You can include headers if needed, such as authorization headers
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    // Add any other headers as needed
+                },
+            };
+
+            // Using the fetch API to make a GET request with specified options
+            fetch(apiUrl, options)
+                .then(response => {
+                    console.log(response.headers.get('content-type'))
+                    // Check if the request was successful (status code 200)
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    // Parse the response as JSON
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the data
+                    console.log(data)
+                    displayData(data);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Fetch error:', error);
+                });
+        }
+
+        function displayData(data) {
+            // Display the fetched data in a table in the data-container element
+            const dataContainer = document.getElementById('product-display');
+
+            // Create a table element
+            const table = document.createElement('table');
+
+            // Create table headers
+            const headers = Object.keys(data[0]);
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+
+            const actionsHeader = document.createElement('th');
+            actionsHeader.textContent = 'Actions';
+            headerRow.appendChild(actionsHeader);
+            table.appendChild(headerRow);
+            // Create table rows with data
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = item[header];
+                    row.appendChild(td);
+                });
+                const deleteButtonCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete-button';
+                deleteButton.addEventListener('click', function () {
+                    deleteRow(row);
+                });
+                deleteButtonCell.appendChild(deleteButton);
+                row.appendChild(deleteButtonCell);
+
+                table.appendChild(row);
+            });
+
+            // Append the table to the data-container
+            dataContainer.innerHTML = '';
+            dataContainer.appendChild(table);
+        }
+
+        function deleteRow(row) {
+
+            let productName = row.querySelector('td').textContent
+
+            fetch(`http://localhost:8080/ztp_1_war/products?productName=${encodeURIComponent(productName)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If the server successfully deletes the product, remove the row from the table
+                        const index = row.rowIndex;
+                        row.parentNode.deleteRow(index);
+                    } else {
+                        // Handle errors or show a message to the user
+                        console.error('Failed to delete product');
+                    }
+                })
+                .catch(error => {
+                    // Handle network errors
+                    console.error('Network error:', error);
+                });
+
+        }
+
+        fetchData()
+    </script>
+    <script>
+        function submitForm() {
+
+            const apiUrl = 'http://localhost:8080/ztp_1_war/products';
+
+            var formData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: document.getElementById('price').value,
+                weight: document.getElementById('weight').value
+            };
+
+            // Send POST request
+            fetch( apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response if needed
+                    console.log('Success:', data);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error:', error);
+                });
+        }
+
+        // document.getElementById('product-add-form').addEventListener('submit', function (event) {
+        //     // Prevent the default form submission behavior
+        //     event.preventDefault();
+        //
+        //     // Call the submitForm function
+        //     submitForm();
+        // });
+    </script>
+</body>
+</html>
